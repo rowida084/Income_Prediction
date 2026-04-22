@@ -1,0 +1,93 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+%matplotlib inline
+# byzhr old output
+
+#read data
+data = pd.read_csv("/content/train_cleaned_v1.csv")
+
+#analyzing data
+
+data.head(20)
+data.describe()
+data.info()
+data.value_counts()
+data.shape
+data.duplicated()
+print (data.duplicated().sum())
+print (data.isnull().sum())
+
+# handled missing values and duplicates 
+
+data.replace(['?', ' ?','? '], np.nan, inplace=True)
+data=data.drop_duplicates()
+
+for col in data.columns: #fill nulls (note only categorical nulls)
+    if data[col].dtype == 'object':
+        data[col].fillna(data[col].mode()[0], inplace=True)
+    else:
+        data[col].fillna(data[col].median(), inplace=True)
+
+
+# searching for outliers -> handling later
+
+for col in data.columns:
+    if data[col].dtype != 'object':
+
+        print (data[col].name)
+        print( )
+
+        Q1=data[col].quantile(0.25)
+        Q3=data[col].quantile(0.75)
+        IQR=Q3-Q1
+        lower_bound=Q1-1.5*IQR
+        upper_bound=Q3+1.5*IQR
+
+        print("lower_bound = "+ str(lower_bound))
+        print("upper_bound = "+ str(upper_bound))
+        print ("min = "+str(data[col].min()))
+        print ("max = "+str(data[col].max()))
+
+        print( )
+        print( )
+
+
+# checking number of categories(different values ) in single column to determine the best encoding technique
+
+for col in data.columns:
+    if data[col].dtype == 'object':
+        print (data[col].name)
+        print( data[col].value_counts().count())
+        print( )
+
+
+
+# grouping native-country column to encode 
+
+data['native-country'] = data['native-country'].apply(
+    lambda x: 'US' if x == 'United-States' else 'Other'
+)
+
+
+# binary encoding
+data['sex'] = data['sex'].map({"Male": 1, "Female": 0})
+
+data['Income ']=data['Income '].map({">50K":1,"<=50K":0})
+
+#encoding ( one hot technique )
+
+categorical_cols = [
+    "workclass",
+    "marital-status",
+    "occupation",
+    "relationship",
+    "native-country"
+]
+
+data = pd.get_dummies(data, columns=categorical_cols, drop_first=False)
+
+
+
