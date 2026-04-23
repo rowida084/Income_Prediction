@@ -59,7 +59,7 @@ categorical_cols = [
     "native-country"
 ]
 
-data = pd.get_dummies(data, columns=categorical_cols, drop_first=True)
+data = pd.get_dummies(data, columns=categorical_cols, drop_first=False)
 
 # 5. Handle Outliers
 
