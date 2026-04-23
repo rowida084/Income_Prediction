@@ -18,7 +18,7 @@ data = pd.read_csv("/content/train_cleaned_v1.csv")
 
 data.replace(['?', ' ?','? '], np.nan, inplace=True)
 
-# strip spaces أول حاجة
+# remove spaces
 for col in data.select_dtypes(include='object').columns:
     data[col] = data[col].str.strip()
 
@@ -38,8 +38,29 @@ data.rename(columns={"Income ": "Income"}, inplace=True)
 
 # reduce(grouping) native-country
 data['native-country'] = data['native-country'].apply(
-    lambda x: 'US' if x == 'United-States' else 'Other'
+    lambda x: 'USA' if x == 'United-States' else 'Other'
 )
+
+def work_status(x):
+    if x < 35:
+        return "part-time"
+    elif x <= 45:
+        return "full-time"
+    else:
+        return "over-time"
+
+data['work_status'] = data['hours-per-week'].apply(work_status)
+
+
+work_map = {
+    "part-time": 0,
+    "full-time": 1,
+    "over-time": 2
+}
+data['work_status'] = data['work_status'].map(work_map)
+
+data['has_gain'] = (data['capital-gain'] > 0).astype(int)
+
 
 
 # 4. Encoding
@@ -63,11 +84,23 @@ data = pd.get_dummies(data, columns=categorical_cols, drop_first=False)
 
 # 5. Handle Outliers
 
-data['age'] = data['age'].clip(17, 80)
+# clip
+Q1 = data['age'].quantile(0.25)
+Q3 = data['age'].quantile(0.75)
+IQR = Q3 - Q1
+
+lower = Q1 - 1.5 * IQR
+upper = Q3 + 1.5 * IQR
+
+data['age'] = data['age'].clip(lower, upper)
 
 # log transform
 data['capital-gain'] = np.log1p(data['capital-gain'])
 data['capital-loss'] = np.log1p(data['capital-loss'])
+
+
+data['has_gain'] = (data['capital-gain'] > 0).astype(int)
+
 
 # 6. Remove Duplicates
 
