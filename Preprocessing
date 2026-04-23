@@ -73,9 +73,11 @@ data['native-country'] = data['native-country'].apply(
 
 
 # binary encoding
-data['sex'] = data['sex'].map({"Male": 1, "Female": 0})
+data['sex'] = data['sex'].str.strip()
+data['sex'] = data['sex'].map({'Male': 1, 'Female': 0})
 
-data['Income ']=data['Income '].map({">50K":1,"<=50K":0})
+data['Income '] = data['Income '].str.strip()
+data['Income ']=data['Income '].map({'>50K':1,'<=50K':0})
 
 #encoding ( one hot technique )
 
