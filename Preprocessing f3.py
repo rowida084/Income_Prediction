@@ -156,3 +156,4 @@ preprocessing_objects = {
 }
 
 joblib.dump(preprocessing_objects, "preprocessing.pkl")
+data.to_csv("train_cleaned_final.csv", index=False)
