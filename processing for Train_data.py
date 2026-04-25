@@ -32,6 +32,9 @@ for col in numeric_cols:
 for col in data.select_dtypes(include='object').columns:
     data[col] = data[col].str.strip()
 
+data['Income'] = data['Income'].str.replace('.', '', regex=False)
+
+
 # fill missing
 # fill categorical columns
 for col in data.select_dtypes(include='object').columns:
@@ -109,9 +112,6 @@ data['age'] = data['age'].clip(lower, upper)
 # log transform
 data['capital-gain'] = np.log1p(data['capital-gain'])
 data['capital-loss'] = np.log1p(data['capital-loss'])
-
-
-data['has_gain'] = (data['capital-gain'] > 0).astype(int)
 
 
 # 6. Remove Duplicates
