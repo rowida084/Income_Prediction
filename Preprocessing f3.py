@@ -3,14 +3,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 
-%matplotlib inline
+#%matplotlib inline
 # byzhr old output
 
 
 
 # 1.read data
 
-data = pd.read_csv("/content/train_cleaned_v1.csv")
+data = pd.read_csv("train_cleaned_v1.csv")
 
 
 
@@ -18,16 +18,28 @@ data = pd.read_csv("/content/train_cleaned_v1.csv")
 
 data.replace(['?', ' ?','? '], np.nan, inplace=True)
 
+numeric_cols = [
+    "age",
+    "education-num",
+    "capital-gain",
+    "capital-loss",
+    "hours-per-week"
+]
+
+for col in numeric_cols:
+    data[col] = pd.to_numeric(data[col], errors='coerce')
 # remove spaces
 for col in data.select_dtypes(include='object').columns:
     data[col] = data[col].str.strip()
 
 # fill missing
-for col in data.columns:
-    if data[col].dtype == 'object':
-        data[col].fillna(data[col].mode()[0], inplace=True)
-    else:
-        data[col].fillna(data[col].median(), inplace=True)
+# fill categorical columns
+for col in data.select_dtypes(include='object').columns:
+    data[col] = data[col].fillna(data[col].mode()[0])
+
+# fill numeric columns (important 🔥)
+for col in numeric_cols:
+    data[col] = data[col].fillna(data[col].median())
 
 
 # 3. Feature Cleaning
@@ -61,7 +73,7 @@ data['work_status'] = data['work_status'].map(work_map)
 
 data['has_gain'] = (data['capital-gain'] > 0).astype(int)
 
-
+freq = data['occupation'].value_counts().to_dict()
 
 # 4. Encoding
 
@@ -71,15 +83,11 @@ data['sex'] = data['sex'].map({'Male': 1, 'Female': 0})
 # target
 data['Income'] = data['Income'].map({'>50K':1,'<=50K':0})
 
-# freq
-freq = data['occupation'].value_counts()
-data['occupation'] = data['occupation'].map(freq)
-
-
 # one-hot
 categorical_cols = [
     "workclass",
     "marital-status",
+    "occupation",
     "relationship",
     "native-country"
 ]
@@ -101,10 +109,9 @@ data['age'] = data['age'].clip(lower, upper)
 # log transform
 data['capital-gain'] = np.log1p(data['capital-gain'])
 data['capital-loss'] = np.log1p(data['capital-loss'])
-data['occupation'] = np.log1p(data['occupation'])
 
 
-
+data['has_gain'] = (data['capital-gain'] > 0).astype(int)
 
 
 # 6. Remove Duplicates
@@ -119,10 +126,33 @@ scaler = StandardScaler()
 numeric_cols = [
     "age",
     "education-num",
-    "occupation",
     "capital-gain",
     "capital-loss",
     "hours-per-week"
 ]
 
 data[numeric_cols] = scaler.fit_transform(data[numeric_cols])
+import joblib
+
+medians = {}
+modes = {}
+
+for col in data.columns:
+    if data[col].dtype == 'object':
+        modes[col] = data[col].mode()[0]
+    else:
+        medians[col] = data[col].median()
+
+#freq = data['occupation'].value_counts().to_dict()
+
+training_columns = data.columns
+
+preprocessing_objects = {
+    "medians": medians,
+    "modes": modes,
+    "freq": freq,
+    "scaler": scaler,
+    "columns": training_columns
+}
+
+joblib.dump(preprocessing_objects, "preprocessing.pkl")
