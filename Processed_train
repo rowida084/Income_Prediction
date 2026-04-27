@@ -31,6 +31,7 @@ numeric_cols = [
 
 for col in numeric_cols:
     data[col] = pd.to_numeric(data[col], errors='coerce')
+    data[col] = data[col].fillna(data[col].median())
 # remove spaces
 for col in data.select_dtypes(include='object').columns:
     data[col] = data[col].str.strip()
@@ -41,9 +42,7 @@ for col in data.select_dtypes(include='object').columns:
 for col in data.select_dtypes(include='object').columns:
     data[col] = data[col].fillna(data[col].mode()[0])
 
-# fill numeric columns (important 🔥)
-for col in numeric_cols:
-    data[col] = data[col].fillna(data[col].median())
+   
 
 
 # 3. Feature Cleaning
@@ -54,6 +53,8 @@ for col in numeric_cols:
 data['native-country'] = data['native-country'].apply(
     lambda x: 'USA' if x == 'United-States' else 'Other'
 )
+
+data['net_capital'] = data['capital-gain'] - data['capital-loss']
 
 def work_status(x):
     if x < 35:
@@ -123,14 +124,7 @@ data = data.drop_duplicates()
 
 scaler = StandardScaler()
 
-numeric_cols = [
-    "age",
-    "education-num",
-    "capital-gain",
-    "capital-loss",
-    "hours-per-week",
-    "work_status"
-]
+numeric_cols += ["work_status","net_capital"]
 
 data[numeric_cols] = scaler.fit_transform(data[numeric_cols])
 import joblib
@@ -155,4 +149,4 @@ preprocessing_objects = {
 }
 
 joblib.dump(preprocessing_objects, "preprocessing.pkl")
-data.to_csv("processed_train_hot_data.csv", index=False)
+data.to_csv("processed_train_hott_data.csv", index=False)
