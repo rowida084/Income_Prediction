@@ -9,6 +9,7 @@ modes = preprocessing_objects["modes"]
 freq = preprocessing_objects["freq"]
 scaler = preprocessing_objects["scaler"]
 training_columns = preprocessing_objects["columns"]
+lower, upper = preprocessing_objects["age_bounds"]
 
 data = pd.read_csv("test_data.csv")
 
@@ -68,7 +69,7 @@ data['sex'] = data['sex'].map({'Male': 1, 'Female': 0})
 data['Income'] = data['Income'].map({'>50K':1,'<=50K':0})
 
 # freq encoding
-data['occupation'] = data['occupation'].map(freq).fillna(0)
+data['occupation'] = data['occupation'].map(freq).fillna(freq.mean())
 
 # one-hot
 data = pd.get_dummies(data)
@@ -76,12 +77,6 @@ data = pd.get_dummies(data)
 data = data.reindex(columns=training_columns, fill_value=0)
 
 #outliers
-Q1 = data['age'].quantile(0.25)
-Q3 = data['age'].quantile(0.75)
-IQR = Q3 - Q1
-
-lower = Q1 - 1.5 * IQR
-upper = Q3 + 1.5 * IQR
 
 data['age'] = data['age'].clip(lower, upper)
 
