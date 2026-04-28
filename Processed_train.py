@@ -145,7 +145,8 @@ preprocessing_objects = {
     "medians": medians,
     "modes": modes,
     "scaler": scaler,
-    "columns": training_columns
+    "columns": training_columns,
+    "age_bounds": (lower, upper)
 }
 
 joblib.dump(preprocessing_objects, "preprocessing.pkl")
