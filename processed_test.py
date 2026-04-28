@@ -7,6 +7,7 @@ medians = preprocessing_objects["medians"]
 modes = preprocessing_objects["modes"]
 scaler = preprocessing_objects["scaler"]
 training_columns = preprocessing_objects["columns"]
+lower, upper = preprocessing_objects["age_bounds"]
 
 data = pd.read_csv("/content/test_data.csv")
 
@@ -75,12 +76,6 @@ data = data.reindex(columns=training_columns, fill_value=0)##edit
 
 
 #outliers
-Q1 = data['age'].quantile(0.25)
-Q3 = data['age'].quantile(0.75)
-IQR = Q3 - Q1
-
-lower = Q1 - 1.5 * IQR
-upper = Q3 + 1.5 * IQR
 
 data['age'] = data['age'].clip(lower, upper)
 
