@@ -132,7 +132,8 @@ preprocessing_objects = {
     "modes": modes,
     "freq" : freq,
     "scaler": scaler,
-    "columns": training_columns
+    "columns": training_columns,
+    "age_bounds": (lower, upper)
 }
 
 joblib.dump(preprocessing_objects, "preprocessing.pkl")
