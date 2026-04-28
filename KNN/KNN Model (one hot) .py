@@ -56,7 +56,7 @@ x_train = scaler.fit_transform(x_train)
 x_test = scaler.transform(x_test)
 
 
-model = KNN(k=7)
+model = KNN(k=29)
 model.fit(x_train,y_train)
 predictions = model.predict(x_test)
 print ("accuracy",accuracy_score(y_test,predictions))
