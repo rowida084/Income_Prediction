@@ -69,7 +69,7 @@ data['sex'] = data['sex'].map({'Male': 1, 'Female': 0})
 data['Income'] = data['Income'].map({'>50K':1,'<=50K':0})
 
 # freq encoding
-data['occupation'] = data['occupation'].map(freq).fillna(freq.mean())
+data['occupation'] = data['occupation'].map(freq).fillna(0) # more accuracy than freq.mean() idk how
 
 # one-hot
 data = pd.get_dummies(data)
