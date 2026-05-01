@@ -36,8 +36,6 @@ for depth in [8, 10, 12, 15]:
             y_pred = model.predict(X_test)
             acc = accuracy_score(y_test, y_pred)
 
-            print(f"depth={depth}, leaf={leaf}, split={split} → Accuracy={acc}")
-
             if acc > best_acc:
                 best_acc = acc
                 best_model = model
@@ -48,7 +46,6 @@ for depth in [8, 10, 12, 15]:
                 }
 
 print("\nBest Parameters:", best_params)
-print("Best Accuracy:", best_acc)
 
 # final model
 y_pred = best_model.predict(X_test)
