@@ -21,9 +21,9 @@ best_acc = 0
 best_params = {}
 
 
-for n in [50, 100, 150]:
-    for depth in [10, 15, 20]:
-        for leaf in [1, 2, 4]:
+for n in [100, 200, 300]:  # old [50,100,150]
+    for depth in [10, 15, 20,None]: # old [10, 15, 20]
+        for leaf in [1, 2, 3 ,5]: # old  [1, 2, 4]
 
             model = RandomForestClassifier(
                 n_estimators=n,
