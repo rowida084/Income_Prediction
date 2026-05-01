@@ -69,4 +69,4 @@ print("\nTop 10 Important Features:\n")
 print(importance.head(10))
 
 # save model
-joblib.dump({"model": model, "columns": list(X_train.columns)}, "model_rf.pkl")
+joblib.dump({"model": model, "columns": list(X_train.columns)}, "forest_model_rf.pkl")
