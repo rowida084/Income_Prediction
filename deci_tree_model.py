@@ -4,10 +4,11 @@
 import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+import joblib
 
 # load data
-train = pd.read_csv("processed_train_hot_data.csv")
-test = pd.read_csv("processed_test_hot_data.csv")
+train = pd.read_csv("processed_train_hott_data.csv")
+test = pd.read_csv("processed_test_hott_data.csv")
 
 # split features and target
 X_train = train.drop("Income", axis=1)
@@ -70,3 +71,6 @@ importance = pd.Series(
 
 print("\nTop 10 Important Features:\n")
 print(importance.head(10))
+
+# save model
+joblib.dump({"model": model, "columns": list(X_train.columns)}, "deci_model_rf.pkl")
