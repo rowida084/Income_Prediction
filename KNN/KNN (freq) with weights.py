@@ -138,7 +138,7 @@ print(f"Best CV Accuracy: {best_acc:.4f}")
 # =========================
 # FINAL MODEL
 # =========================
-final_model = KNeighborsClassifier(n_neighbors=best_k,weights='distance')
+final_model = KNeighborsClassifier(n_neighbors=best_k,weights='distance')# the best k=3 
 final_model.fit(X_train, y_train)
 
 proba = final_model.predict_proba(X_test)[:, 1]
