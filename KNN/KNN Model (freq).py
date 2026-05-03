@@ -108,7 +108,8 @@ print(f"Best CV F1: {best_score:.4f}")
 # =========================
 # FINAL MODEL
 # =========================
-final_model = KNN(k=best_k)
+#final_model = KNN(k=best_k)
+final_model = KNeighborsClassifier(n_neighbors=best_k)
 final_model.fit(X_train, y_train)
 
 test_pred = final_model.predict(X_test)
