@@ -88,7 +88,7 @@ best_score = 0
 
 
 
-for k in range(1, 60, 2):# the best accuracy 83.08 with k = 37
+for k in range(1, 60, 2):# the best accuracy 83.49 with k = 37
 
     model = KNeighborsClassifier(n_neighbors=k)
 
