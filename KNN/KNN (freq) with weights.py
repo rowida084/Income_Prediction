@@ -1,9 +1,10 @@
 
 import numpy as np
 import pandas as pd
+from imblearn.over_sampling import SMOTE
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import accuracy_score,f1_score
+from sklearn.metrics import accuracy_score,f1_score,precision_score, recall_score, classification_report
 from sklearn.neighbors import KNeighborsClassifier
 
 
@@ -66,7 +67,20 @@ X_train, X_val, y_train, y_val = train_test_split(
     stratify=y
 )
 
+
+# =========================
+# ALIGN TEST COLUMNS (IMPORTANT FIX)
+# =========================
 X_test = X_test.reindex(columns=X_train.columns, fill_value=0)
+
+# =========================
+# SMOTE (IMPORTANT)
+# =========================
+from imblearn.over_sampling import SMOTE
+
+smote = SMOTE(random_state=42)
+X_train, y_train = smote.fit_resample(X_train, y_train)
+
 # =========================
 # SCALING (VERY IMPORTANT FOR KNN)
 # =========================
@@ -88,7 +102,7 @@ best_score = 0
 
 
 
-for k in range(1, 60, 2):# the best accuracy 83.49 with k = 37
+for k in range(1, 30, 2):# the best accuracy 83.49 with k = 37
 
     model = KNeighborsClassifier(n_neighbors=k)
 
@@ -97,7 +111,7 @@ for k in range(1, 60, 2):# the best accuracy 83.49 with k = 37
         X_train,
         y_train,
         cv=5,
-        scoring='f1_weighted'
+        scoring='recall'
     )
 
     acc_scores = cross_val_score(
@@ -124,13 +138,20 @@ print(f"Best CV Accuracy: {best_acc:.4f}")
 # =========================
 # FINAL MODEL
 # =========================
-final_model = KNeighborsClassifier(n_neighbors=best_k)
+final_model = KNeighborsClassifier(n_neighbors=best_k,weights='distance')
 final_model.fit(X_train, y_train)
 
-test_pred = final_model.predict(X_test)
+proba = final_model.predict_proba(X_test)[:, 1]
+test_pred = (proba > 0.4).astype(int)
+test_precision = precision_score(y_test, test_pred, average='weighted')
+test_recall = recall_score(y_test, test_pred, average='weighted')
+
 
 test_acc = accuracy_score(y_test, test_pred)
 test_f1 = f1_score(y_test, test_pred, average='weighted')
 
 print("\nFinal Test Accuracy:", test_acc)
 print("Final Test F1-score:", test_f1)
+print("Final Test Precision:", test_precision)
+print("Final Test Recall:", test_recall)
+print(classification_report(y_test, test_pred))
