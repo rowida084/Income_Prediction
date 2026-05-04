@@ -61,7 +61,22 @@ def train_random_forest(X_train, y_train, X_val, y_val, params):
 
 
 
+def train_svm(X_train, y_train, X_val, y_val, params):
 
+    model = SVC(
+        kernel='rbf',
+        C=params["C"],
+        gamma=params["gamma"],
+        class_weight='balanced',
+        probability=True,
+        random_state=42
+    )
+
+    model.fit(X_train, y_train)
+
+    pred = model.predict(X_val)
+
+    return model
 
 
 
