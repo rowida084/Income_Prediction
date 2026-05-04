@@ -60,29 +60,7 @@ def train_random_forest(X_train, y_train, X_val, y_val, params):
 
 
 
-def train_logistic(X_train, y_train, X_val, y_val, params):
 
-    best_model = None
-    best_score = 0
-
-    for c in params["C"]:
-
-        model = LogisticRegression(
-            C=c,
-            max_iter=1000,
-            class_weight='balanced'
-        )
-
-        model.fit(X_train, y_train)
-        pred = model.predict(X_val)
-
-        f1 = f1_score(y_val, pred)
-
-        if f1 > best_score:
-            best_score = f1
-            best_model = model
-
-    return best_model
 
 
 
