@@ -8,8 +8,8 @@ from sklearn.model_selection import train_test_split
 # =========================
 # load data
 # =========================
-train = pd.read_csv("processed_train_freq_data.csv")
-test  = pd.read_csv("processed_test_freq_data.csv")
+train = pd.read_csv("processed_train_hott_data.csv")
+test  = pd.read_csv("processed_test_hott_data.csv")
 
 X = train.drop("Income", axis=1)
 y = train["Income"]
