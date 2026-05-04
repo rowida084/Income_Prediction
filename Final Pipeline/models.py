@@ -30,11 +30,11 @@ models_config = {
     "KNN": {
         "model": KNeighborsClassifier(weights='distance'),
         "params": {
-            "model__n_neighbors": [1, 30, 2]
+            "model__n_neighbors": list(range(1, 30, 2))
         }
     },
     
     "SVM": {
-        "model": SVC(kernel='rbf',gamma=0.01, random_state=42 ,C=30,class_weight={0:1,1:2})
+        "model": SVC(kernel='rbf',gamma=0.01, random_state=42 ,C=30,class_weight={0:1,1:2},probability=True)
     }
 }    
