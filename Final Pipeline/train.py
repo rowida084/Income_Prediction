@@ -106,7 +106,7 @@ for name, config in models_config.items():
     
     
     # VALIDATION
-    y_val_pred  = model.predict(X_val)
+    y_val_pred  = pipeline.predict(X_val)
 
 
 
