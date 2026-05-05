@@ -75,14 +75,13 @@ cat_pipeline = Pipeline([
     ("onehot", OneHotEncoder(handle_unknown="ignore"))
 ])
 
-preprocessor = {
-    "features": FeatureEngineering(),
-    "transform": ColumnTransformer([
+preprocessor = Pipeline([
+    ("features", FeatureEngineering()),
+    ("transform", ColumnTransformer([
         ("num", num_pipeline, num_cols),
         ("cat", cat_pipeline, cat_cols)
-    ], remainder='passthrough')
-    }
-  
+    ], remainder='passthrough'))
+])
 # ============================================================
 # STEP 5 — Train على الـ Fit Preprocessor 
 # ============================================================
