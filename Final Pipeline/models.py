@@ -75,21 +75,14 @@ def train_logistic(X_train, y_train, X_val, y_val, params):
     best_score = 0
 
     for c in params["C"]:
-        model = Pipeline([
-            ("scaler", StandardScaler()),
-            ("clf", LogisticRegression(
-                C=c,
-                max_iter=1000,
-                class_weight='balanced',
-                random_state=42
-            ))
-        ])
-
+        model = LogisticRegression(
+            C=c,
+            max_iter=1000,
+            class_weight='balanced',
+            random_state=42
+        )
         model.fit(X_train, y_train)
-
-        y_pred = model.predict(X_val)
-        f1 = f1_score(y_val, y_pred)
-
+        f1 = f1_score(y_val, model.predict(X_val))
         if f1 > best_score:
             best_score = f1
             best_model = model
