@@ -5,6 +5,8 @@ from sklearn.svm import SVC
 from sklearn.metrics import f1_score
 from sklearn.model_selection import cross_val_score
 
+
+# ── Decision Tree ──────────────────────────────────────────
 def train_decision_tree(X_train, y_train, X_val, y_val, params):
 
     best_model = None
@@ -35,7 +37,7 @@ def train_decision_tree(X_train, y_train, X_val, y_val, params):
     return best_model
 
 
-
+# ── Random Forest ──────────────────────────────────────────
 def train_random_forest(X_train, y_train, X_val, y_val, params):
 
     best_model = None
@@ -67,8 +69,37 @@ def train_random_forest(X_train, y_train, X_val, y_val, params):
     return best_model
 
 
+ # ── Logistic Regression ────────────────────────────────────
+def train_logistic(X_train, y_train, X_val, y_val, params):
+    best_model = None
+    best_score = 0
+
+    for c in params["C"]:
+        model = Pipeline([
+            ("scaler", StandardScaler()),
+            ("clf", LogisticRegression(
+                C=c,
+                max_iter=1000,
+                class_weight='balanced',
+                random_state=42
+            ))
+        ])
+
+        model.fit(X_train, y_train)
+
+        y_pred = model.predict(X_val)
+        f1 = f1_score(y_val, y_pred)
+
+        if f1 > best_score:
+            best_score = f1
+            best_model = model
+
+    print(f"  Best Val F1: {best_score:.4f}")
+    return best_model
 
 
+
+# ── SVM ────────────────────────────────────────────────────
 def train_svm(X_train, y_train, X_val, y_val, params):
 
     model = SVC(
@@ -88,7 +119,29 @@ def train_svm(X_train, y_train, X_val, y_val, params):
     return model
 
 
+# ── KNN ────────────────────────────────────
+def train_knn(X_train, y_train, X_val, y_val, params):
+    best_model = None
+    best_score = 0
 
+    for k in params["n_neighbors"]:
+        for w in params["weights"]:  
+            model = KNeighborsClassifier(
+                n_neighbors=k,
+                weights=w
+            )
+
+            model.fit(X_train, y_train)
+
+            y_pred = model.predict(X_val)
+            f1 = f1_score(y_val, y_pred, average='weighted')
+
+            if f1 > best_score:
+                best_score = f1
+                best_model = model
+
+    print(f"  Best Val F1: {best_score:.4f}")
+    return best_model
 
 
 # =========================
