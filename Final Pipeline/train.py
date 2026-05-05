@@ -112,7 +112,7 @@ for name, config in models_config.items():
 
 
     # FINAL TRAIN (train + val)
-     model.fit(X_full_proc, y)
+    model.fit(X_full_proc, y)
 
     # TEST
     y_pred  = model.predict(X_test_proc)
