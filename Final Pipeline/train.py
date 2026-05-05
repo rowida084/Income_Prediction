@@ -83,6 +83,14 @@ preprocessor = Pipeline([
     ], remainder='passthrough'))
 ])
 
+# =========================
+# 3) Fit preprocessing ONCE
+# =========================
+X_train_proc = preprocessor.fit_transform(X_train, y_train)
+X_val_proc   = preprocessor.transform(X_val)
+X_test_proc  = preprocessor.transform(X_test)
+X_full_proc  = preprocessor.transform(X)
+
 # ============================================================
 # Train All Models
 # ============================================================   
@@ -94,43 +102,39 @@ for name, config in models_config.items():
     trainer = config["trainer"]
     params  = config["params"]
 
-    model = trainer(params)
+    
+    model = trainer(X_train_proc, y_train, X_val_proc, y_val, params)
 
-    pipeline = Pipeline([
-        ("preprocessor", preprocessor),
-        ("model", model)
-    ])
-    
-    # TRAIN
-    pipeline.fit(X_train, y_train)
-    
     
     # VALIDATION
-    y_val_pred  = pipeline.predict(X_val)
+    # y_val_pred  = model.predict(X_val)
 
 
 
     # FINAL TRAIN (train + val)
-    pipeline.fit(X, y)
+     model.fit(X_full_proc, y)
 
     # TEST
-    y_test_pred = pipeline.predict(X_test)
+    y_pred  = model.predict(X_test_proc)
 
     
    
     print(f"\nTest Results — {name}:")
-    print(f"  Accuracy : {accuracy_score(y_test, y_test_pred):.4f}")
-    print(f"  F1 Score : {f1_score(y_test, y_test_pred):.4f}")
-    print(f"  Recall   : {recall_score(y_test, y_test_pred):.4f}")
-    print(f"  \nConfusion Matrix   : {confusion_matrix(y_test, y_test_pred)}")
-    
-    print(classification_report(y_test, y_test_pred))
+    print(f"  Accuracy : {accuracy_score(y_test, y_pred ):.4f}")
+    print(f"  F1 Score : {f1_score(y_test, y_pred ):.4f}")
+    print(f"  Recall   : {recall_score(y_test, y_pred ):.4f}")
+    print(f"  \nConfusion Matrix   : {confusion_matrix(y_test, y_pred )}")
+    print(classification_report(y_test, y_pred ))
 
 
     # Save 
+    pipeline = Pipeline([
+        ("preprocessor", preprocessor),
+        ("model", model)
+    ])
 
     filename = f"pipeline_{name.lower()}.pkl"
     joblib.dump(pipeline, filename)
  
-    trained_models[name] = full_pipeline
+    trained_models[name] = pipeline
 print("\nAll models trained and saved ")
