@@ -76,3 +76,27 @@ preprocessor = {
         ("cat", cat_pipeline, cat_cols)
     ])
   
+
+
+ # not true ik consider it a placeholer   
+for name, config in models_config.items():
+
+    print(f"\n Training {name}")
+
+    trainer = config["trainer"]
+    params  = config["params"]
+
+    model = trainer(X_train, y_train, X_val, y_val, params)
+
+    # handling KNN scaler
+    if isinstance(model, tuple):
+        model, scaler = model
+        X_test_used = scaler.transform(X_test)
+    else:
+        X_test_used = X_test
+
+    y_pred = model.predict(X_test_used)
+
+    print("Accuracy:", accuracy_score(y_test, y_pred))
+    print("F1:", f1_score(y_test, y_pred))
+    
