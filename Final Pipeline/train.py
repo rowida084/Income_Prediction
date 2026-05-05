@@ -20,17 +20,23 @@ from models import train_model
 # =========================
 #  Load Data
 # =========================
-data = pd.read_csv("train_cleaned_v1.csv")
+train = pd.read_csv("train_data.csv")
+test  = pd.read_csv("test_data.csv")
 
-data['Income'] = data['Income'].astype(str).str.strip().str.replace('.', '', regex=False)
-data['Income'] = data['Income'].map({'>50K': 1, '<=50K': 0})
+for data in [train_raw, test_raw]:
+    data.rename(columns={"Income ": "Income"}, inplace=True)
+    data['Income'] = data['Income'].astype(str).str.strip().str.replace('.', '', regex=False)
+    data['Income'] = data['Income'].map({'>50K': 1, '<=50K': 0})
 
-data = data.drop_duplicates()
+train = train.drop_duplicates()
 
 # data = data.dropna(subset=['Income'])
 
-X = data.drop("Income", axis=1)
-y = data["Income"]
+X = train.drop("Income", axis=1)
+y = train["Income"]
+
+X_test   = test.drop('Income', axis=1)
+y_test   = test['Income']
 
 # =========================
 #  Split
@@ -74,11 +80,24 @@ preprocessor = {
     "transform": ColumnTransformer([
         ("num", num_pipeline, num_cols),
         ("cat", cat_pipeline, cat_cols)
-    ])
+    ], remainder='passthrough')
+    }
   
+# ============================================================
+# STEP 5 — Train على الـ Fit Preprocessor 
+# ============================================================
+X_train_proc = preprocessor.fit_transform(X_train, y_train)
+X_val_proc   = preprocessor.transform(X_val)
+X_test_proc  = preprocessor.transform(X_test)
+ 
+print(f"Train        shape after preprocessing: {X_train_proc.shape}")
+print(f"Validation   shape after preprocessing: {X_val_proc.shape}")
+print(f"Test         shape after preprocessing: {X_test_proc.shape}")
 
-
- # not true ik consider it a placeholer   
+# ============================================================
+# STEP 6 — Train All Models
+# ============================================================   
+trained_models = {}
 for name, config in models_config.items():
 
     print(f"\n Training {name}")
@@ -86,17 +105,29 @@ for name, config in models_config.items():
     trainer = config["trainer"]
     params  = config["params"]
 
-    model = trainer(X_train, y_train, X_val, y_val, params)
+    model = trainer(X_train_proc, y_train, X_val_proc, y_val, params)
 
-    # handling KNN scaler
-    if isinstance(model, tuple):
-        model, scaler = model
-        X_test_used = scaler.transform(X_test)
-    else:
-        X_test_used = X_test
-
-    y_pred = model.predict(X_test_used)
-
-    print("Accuracy:", accuracy_score(y_test, y_pred))
-    print("F1:", f1_score(y_test, y_pred))
+    # Final training على كل الداتا (train + val)
+    X_full_proc = preprocessor.transform(X)
+    model.fit(X_full_proc, y)
     
+    # Evaluate على الـ test
+    y_pred = model.predict(X_test_proc)
+   
+    print(f"\nTest Results — {name}:")
+    print(f"  Accuracy : {accuracy_score(y_test, y_pred):.4f}")
+    print(f"  F1 Score : {f1_score(y_test, y_pred):.4f}")
+    print(classification_report(y_test, y_pred))
+
+
+    # Save pipeline (preprocessor + model)
+    full_pipeline = Pipeline([
+        ("preprocessor", preprocessor),
+        ("model",        model)
+    ])
+    filename = f"pipeline_{name.lower()}.pkl"
+    joblib.dump(full_pipeline, filename)
+    print(f"  Saved → {filename}")
+ 
+    trained_models[name] = full_pipeline
+print("\nAll models trained and saved ✅")
