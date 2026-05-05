@@ -7,6 +7,30 @@ class FeatureEngineering(BaseEstimator, TransformerMixin):
 
     def fit(self, X, y=None):
 
+         # drop 
+        X = X.drop(columns=['fnlwgt', 'education'], errors='ignore')
+
+        # clean
+        X = X.replace(['?', ' ?', '? '], np.nan)
+        for col in X.select_dtypes(include='object').columns:
+            X[col] = X[col].str.strip()
+
+        # numeric
+        num_cols = ["age", "education-num", "capital-gain",
+                    "capital-loss", "hours-per-week"]
+        for col in num_cols:
+            X[col] = pd.to_numeric(X[col], errors='coerce')
+
+        # حفظ medians و modes من الـ train بس
+        self.medians_ = {col: X[col].median() for col in num_cols}
+        self.modes_   = {
+            col: X[col].mode()[0]
+            for col in X.select_dtypes(include='object').columns
+            if not X[col].mode().empty
+        }
+
+
+        
         Q1 = pd.to_numeric(X["age"], errors='coerce').quantile(0.25)
         Q3 = pd.to_numeric(X["age"], errors='coerce').quantile(0.75)
 
@@ -32,11 +56,15 @@ class FeatureEngineering(BaseEstimator, TransformerMixin):
         # numeric تحويل بس (مش fill هنا)
         num_cols = ["age", "education-num", "capital-gain",
                     "capital-loss", "hours-per-week"]
-
         for col in num_cols:
             X[col] = pd.to_numeric(X[col], errors='coerce')
 
-        
+        for col in num_cols:
+            X[col] = X[col].fillna(self.medians_[col])
+
+        for col in X.select_dtypes(include='object').columns:
+            if col in self.modes_:
+                X[col] = X[col].fillna(self.modes_[col])
 
         # feature engineering
         X['native-country'] = X['native-country'].apply(
