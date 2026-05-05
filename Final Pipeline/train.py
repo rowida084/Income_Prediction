@@ -15,7 +15,7 @@ from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 
 from preprocessing import FeatureEngineering
-from models import train_model
+from models import models_config
 
 # =========================
 #  Load Data
