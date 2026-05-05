@@ -8,7 +8,7 @@ class FeatureEngineering(BaseEstimator, TransformerMixin):
     def fit(self, X, y=None):
 
          # drop 
-        X = X.drop(columns=['fnlwgt', 'education'], errors='ignore')
+        X = X.drop(columns=['fnlwgt', 'education','race'], errors='ignore')
 
         # clean
         X = X.replace(['?', ' ?', '? '], np.nan)
