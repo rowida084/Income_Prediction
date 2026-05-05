@@ -1,3 +1,10 @@
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
+from sklearn.metrics import f1_score
+from sklearn.model_selection import cross_val_score
+
 def train_decision_tree(X_train, y_train, X_val, y_val, params):
 
     best_model = None
@@ -24,6 +31,7 @@ def train_decision_tree(X_train, y_train, X_val, y_val, params):
                     best_score = f1
                     best_model = model
 
+    print(f"  Best Val F1: {best_score:.4f}")
     return best_model
 
 
@@ -55,7 +63,7 @@ def train_random_forest(X_train, y_train, X_val, y_val, params):
                 if f1 > best_score:
                     best_score = f1
                     best_model = model
-
+    print(f"  Best Val F1: {best_score:.4f}")
     return best_model
 
 
@@ -74,7 +82,8 @@ def train_svm(X_train, y_train, X_val, y_val, params):
 
     model.fit(X_train, y_train)
 
-    pred = model.predict(X_val)
+    f1 = f1_score(y_val, model.predict(X_val))
+    print(f"  Val F1: {f1:.4f}")
 
     return model
 
