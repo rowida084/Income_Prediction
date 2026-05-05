@@ -31,8 +31,8 @@ class FeatureEngineering(BaseEstimator, TransformerMixin):
 
 
         
-        Q1 = pd.to_numeric(X["age"], errors='coerce').quantile(0.25)
-        Q3 = pd.to_numeric(X["age"], errors='coerce').quantile(0.75)
+        Q1 = X['age'].quantile(0.25)
+        Q3 = X['age'].quantile(0.75)
 
         IQR = Q3 - Q1
         self.lower_ = Q1 - 1.5 * IQR
