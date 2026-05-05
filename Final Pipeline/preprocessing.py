@@ -21,14 +21,6 @@ class FeatureEngineering(BaseEstimator, TransformerMixin):
         for col in num_cols:
             X[col] = pd.to_numeric(X[col], errors='coerce')
 
-        # حفظ medians و modes من الـ train بس
-        self.medians_ = {col: X[col].median() for col in num_cols}
-        self.modes_   = {
-            col: X[col].mode()[0]
-            for col in X.select_dtypes(include='object').columns
-            if not X[col].mode().empty
-        }
-
 
         
         Q1 = X['age'].quantile(0.25)
@@ -59,12 +51,6 @@ class FeatureEngineering(BaseEstimator, TransformerMixin):
         for col in num_cols:
             X[col] = pd.to_numeric(X[col], errors='coerce')
 
-        for col in num_cols:
-            X[col] = X[col].fillna(self.medians_[col])
-
-        for col in X.select_dtypes(include='object').columns:
-            if col in self.modes_:
-                X[col] = X[col].fillna(self.modes_[col])
 
         # feature engineering
         X['native-country'] = X['native-country'].apply(
