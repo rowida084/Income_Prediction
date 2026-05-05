@@ -1,10 +1,15 @@
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn.metrics import f1_score
 from sklearn.model_selection import cross_val_score
- 
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+
+
  
 # ── Decision Tree ──────────────────────────────────────────
 def train_decision_tree(X_train, y_train, X_val, y_val, params):
@@ -62,6 +67,7 @@ def train_random_forest(X_train, y_train, X_val, y_val, params):
  
 # ── SVM ────────────────────────────────────────────────────
 def train_svm(X_train, y_train, X_val, y_val, params):
+
     model = SVC(
         kernel='rbf',
         C=params["C"],
@@ -70,11 +76,67 @@ def train_svm(X_train, y_train, X_val, y_val, params):
         probability=True,
         random_state=42
     )
+
     model.fit(X_train, y_train)
-    f1 = f1_score(y_val, model.predict(X_val))
+    y_pred = model.predict(X_val)
+
+    f1 = f1_score(y_val, y_pred, average='weighted')
+
     print(f"  Val F1: {f1:.4f}")
     return model
  
+ # ── Logistic Regression ────────────────────────────────────
+
+def train_logistic(X_train, y_train, X_val, y_val, params):
+    best_model = None
+    best_score = 0
+
+    for c in params["C"]:
+        model = Pipeline([
+            ("scaler", StandardScaler()),
+            ("clf", LogisticRegression(
+                C=c,
+                max_iter=1000,
+                class_weight='balanced',
+                random_state=42
+            ))
+        ])
+
+        model.fit(X_train, y_train)
+
+        y_pred = model.predict(X_val)
+        f1 = f1_score(y_val, y_pred)
+
+        if f1 > best_score:
+            best_score = f1
+            best_model = model
+
+    print(f"  Best Val F1: {best_score:.4f}")
+    return best_model
+
+# ── KNN ────────────────────────────────────
+def train_knn(X_train, y_train, X_val, y_val, params):
+    best_model = None
+    best_score = 0
+
+    for k in params["n_neighbors"]:
+        for w in params["weights"]:  
+            model = KNeighborsClassifier(
+                n_neighbors=k,
+                weights=w
+            )
+
+            model.fit(X_train, y_train)
+
+            y_pred = model.predict(X_val)
+            f1 = f1_score(y_val, y_pred, average='weighted')
+
+            if f1 > best_score:
+                best_score = f1
+                best_model = model
+
+    print(f"  Best Val F1: {best_score:.4f}")
+    return best_model
  
 # ── Config ─────────────────────────────────────────────────
 models_config = {
@@ -100,10 +162,17 @@ models_config = {
             "C": [0.01, 0.1, 1, 10, 100]
         }
     },
+    "KNN": {
+    "trainer": train_knn,
+    "params": {
+        "n_neighbors": [1, 3, 5, 7, 9, 11, 15],
+        "weights": ["uniform", "distance"]   
+    }
+},
     "SVM": {
         "trainer": train_svm,
         "params": {
-            "C":     30,
+             "C":     30,
             "gamma": 0.01
         }
     }
