@@ -82,19 +82,9 @@ preprocessor = Pipeline([
         ("cat", cat_pipeline, cat_cols)
     ], remainder='passthrough'))
 ])
-# ============================================================
-# STEP 5 — Train على الـ Fit Preprocessor 
-# ============================================================
-X_train_proc = preprocessor.fit_transform(X_train, y_train)
-X_val_proc   = preprocessor.transform(X_val)
-X_test_proc  = preprocessor.transform(X_test)
- 
-# print(f"Train        shape after preprocessing: {X_train_proc.shape}")
-# print(f"Validation   shape after preprocessing: {X_val_proc.shape}")
-# print(f"Test         shape after preprocessing: {X_test_proc.shape}")
 
 # ============================================================
-# STEP 6 — Train All Models
+# Train All Models
 # ============================================================   
 trained_models = {}
 for name, config in models_config.items():
@@ -104,32 +94,43 @@ for name, config in models_config.items():
     trainer = config["trainer"]
     params  = config["params"]
 
-    model = trainer(X_train_proc, y_train, X_val_proc, y_val, params)
+    model = trainer(params)
 
-    # Final training على كل الداتا (train + val)
-    X_full_proc = preprocessor.transform(X)
-    model.fit(X_full_proc, y)
+    pipeline = Pipeline([
+        ("preprocessor", preprocessor),
+        ("model", model)
+    ])
     
-    # Evaluate على الـ test
-    y_pred = model.predict(X_test_proc)
+    # TRAIN
+    pipeline.fit(X_train, y_train)
+    
+    
+    # VALIDATION
+    y_val_pred  = model.predict(X_val)
+
+
+
+    # FINAL TRAIN (train + val)
+    pipeline.fit(X, y)
+
+    # TEST
+    y_test_pred = pipeline.predict(X_test)
+
+    
    
     print(f"\nTest Results — {name}:")
-    print(f"  Accuracy : {accuracy_score(y_test, y_pred):.4f}")
-    print(f"  F1 Score : {f1_score(y_test, y_pred):.4f}")
-    print(f"  Recall   : {recall_score(y_test, y_pred):.4f}")
-    print(f"  \nConfusion Matrix   : {confusion_matrix(y_test, y_pred)}")
+    print(f"  Accuracy : {accuracy_score(y_test, y_test_pred):.4f}")
+    print(f"  F1 Score : {f1_score(y_test, y_test_pred):.4f}")
+    print(f"  Recall   : {recall_score(y_test, y_test_pred):.4f}")
+    print(f"  \nConfusion Matrix   : {confusion_matrix(y_test, y_test_pred)}")
     
-    print(classification_report(y_test, y_pred))
+    print(classification_report(y_test, y_test_pred))
 
 
-    # Save pipeline (preprocessor + model)
-    full_pipeline = Pipeline([
-        ("preprocessor", preprocessor),
-        ("model",        model)
-    ])
+    # Save 
+
     filename = f"pipeline_{name.lower()}.pkl"
-    joblib.dump(full_pipeline, filename)
-    print(f"  Saved → {filename}")
+    joblib.dump(pipeline, filename)
  
     trained_models[name] = full_pipeline
 print("\nAll models trained and saved ")
