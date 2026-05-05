@@ -97,7 +97,7 @@ def train_logistic(X_train, y_train, X_val, y_val, params):
             ("clf", LogisticRegression(
                 C=c,
                 max_iter=1000,
-                class_weight='balanced',
+                class_weight={0:1, 1:2},
                 random_state=42
             ))
         ])
