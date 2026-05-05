@@ -106,7 +106,7 @@ def train_svm(X_train, y_train, X_val, y_val, params):
         kernel='rbf',
         C=params["C"],
         gamma=params["gamma"],
-        class_weight='balanced',
+        class_weight={0:1, 1:2},
         probability=True,
         random_state=42
     )
