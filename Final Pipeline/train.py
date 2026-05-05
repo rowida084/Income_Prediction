@@ -23,7 +23,7 @@ from models import train_model
 train = pd.read_csv("train_data.csv")
 test  = pd.read_csv("test_data.csv")
 
-for data in [train_raw, test_raw]:
+for data in [train, test]:
     data.rename(columns={"Income ": "Income"}, inplace=True)
     data['Income'] = data['Income'].astype(str).str.strip().str.replace('.', '', regex=False)
     data['Income'] = data['Income'].map({'>50K': 1, '<=50K': 0})
