@@ -6,7 +6,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.impute import SimpleImputer
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, f1_score
+from sklearn.metrics import classification_report,accuracy_score, f1_score,recall_score, confusion_matrix
 
 from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import KNeighborsClassifier
@@ -89,9 +89,9 @@ X_train_proc = preprocessor.fit_transform(X_train, y_train)
 X_val_proc   = preprocessor.transform(X_val)
 X_test_proc  = preprocessor.transform(X_test)
  
-print(f"Train        shape after preprocessing: {X_train_proc.shape}")
-print(f"Validation   shape after preprocessing: {X_val_proc.shape}")
-print(f"Test         shape after preprocessing: {X_test_proc.shape}")
+# print(f"Train        shape after preprocessing: {X_train_proc.shape}")
+# print(f"Validation   shape after preprocessing: {X_val_proc.shape}")
+# print(f"Test         shape after preprocessing: {X_test_proc.shape}")
 
 # ============================================================
 # STEP 6 — Train All Models
@@ -116,6 +116,9 @@ for name, config in models_config.items():
     print(f"\nTest Results — {name}:")
     print(f"  Accuracy : {accuracy_score(y_test, y_pred):.4f}")
     print(f"  F1 Score : {f1_score(y_test, y_pred):.4f}")
+    print(f"  Recall   : {recall_score(y_test, y_pred):.4f}")
+    print(f"  \nConfusion Matrix   : {confusion_matrix(y_test, y_pred)}")
+    
     print(classification_report(y_test, y_pred))
 
 
@@ -129,4 +132,4 @@ for name, config in models_config.items():
     print(f"  Saved → {filename}")
  
     trained_models[name] = full_pipeline
-print("\nAll models trained and saved ✅")
+print("\nAll models trained and saved ")
