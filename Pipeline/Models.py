@@ -24,6 +24,7 @@ def train_decision_tree(X_train, y_train, X_val, y_val, params):
                     min_samples_leaf=leaf,
                     min_samples_split=split,
                     criterion='entropy',
+                    class_weight = {0:1, 1:2}, # new line
                     random_state=42
                 )
 
