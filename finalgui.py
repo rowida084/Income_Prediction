@@ -168,10 +168,10 @@ elif st.session_state.page == "prediction":
             df = df.sort_values(by="F1 Score", ascending=False).reset_index(drop=True)
             df["No."] = df.index + 1
 
-            # تحديد أفضل موديل
+            # Best model
             best_name = df.iloc[0]["Model"]
 
-            # تعديل الـ Note (Recommended + Low Recall)
+            
             df["Note"] = df.apply(
                 lambda row:
                     ("⭐ Recommended " if row["Model"] == best_name else "") +
