@@ -37,7 +37,7 @@ class FeatureEngineering(BaseEstimator, TransformerMixin):
         X = X.copy()
 
         # drop
-        X = X.drop(columns=['fnlwgt', 'education'], errors='ignore')
+        X = X.drop(columns=['fnlwgt', 'education','race'], errors='ignore')
 
         # clean
         X.replace(['?', ' ?', '? '], np.nan, inplace=True)
