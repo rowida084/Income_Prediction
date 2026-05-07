@@ -1,5 +1,3 @@
-from google.colab import files
-uploaded=files.upload()
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
