@@ -181,21 +181,15 @@ elif st.session_state.page == "prediction":
         age = st.number_input("Age", min_value=18, max_value=100, value=25)
         workclass = st.selectbox(
             "Work Class",
-            [
-                "Private",
-                "Local-gov",
-                "Never-worked",
-                "Self-emp-inc",
-                "Self-emp-not-inc",
-                "State-gov",
-                "Without-pay",
-            ],
+           ["Private", "Self-empnot-inc","Self-emp-inc",
+                      "Federalgov", "Local-gov", "State-gov",
+                      "Without-pay", "Never-worked"],
         )
         hours_per_week = st.number_input(
             "Hours per week", min_value=1, max_value=100, value=40
         )
         education_num = st.number_input(
-            "Years of Education", min_value=1, max_value=20, value=10
+            "Years of Education", min_value=1, max_value=30, value=10
         )
         marital_status = st.selectbox(
             "Marital Status",
@@ -209,26 +203,28 @@ elif st.session_state.page == "prediction":
                 "Married-spouse-absent",
             ],
         )
-        native_country = st.selectbox("Native Country", ["United-States", "Other"])
+        native_country = st.selectbox("Native Country", ["United-States", "Cambodia", "England",
+                           "Puerto-Rico", "Canada", "Germany", "India",
+                           "Japan", "Greece", "South", "China",
+                           "Cuba", "Iran", "Honduras",
+                           "Philippines", "Italy", "Poland",
+                           "Jamaica", "Vietnam", "Mexico",
+                           "Portugal", "Ireland","France",
+                           "Dominican-Republic"," Laos",
+                           "Ecuador","Taiwan", "Haiti",
+                           "Columbia", "Hungary",
+                           "Guatemala", "Nicaragua",
+                           "Scotland", "Thailand", "Yugoslavia",
+                           "El-Salvador",
+                           "Trinadad&Tobago", "Peru", "Hong",
+                           "Holand-Netherlands","other"],)
 
     with col2:
         occupation = st.selectbox(
             "Occupation",
-            [
-                "Armed-Forces",
-                "Craft-repair",
-                "Exec-managerial",
-                "Farming-fishing",
-                "Handlers-cleaners",
-                "Machine-op-inspct",
-                "Other-service",
-                "Priv-house-serv",
-                "Prof-specialty",
-                "Protective-serv",
-                "Sales",
-                "Tech-support",
-                "Transport-moving",
-            ],
+            ["Admclerical","Armed-Forces","Craft-repair","Exec-managerial","Farming-fishing","Handlers-cleaners",
+                          "Machine-op-inspct","Priv-house-serv","Prof-specialty","Protective-serv",
+                          "Sales","Tech-support","Transport-moving","Other-service"],
         )
         gender = st.selectbox("Sex", ["Male", "Female"])
         relationship = st.selectbox(
@@ -244,6 +240,14 @@ elif st.session_state.page == "prediction":
         )
         capital_gain = st.number_input("Capital Gain", min_value=0, value=0)
         capital_loss = st.number_input("Capital Loss", min_value=0, value=0)
+
+        education = st.selectbox(  
+            "Education" ,
+              ["Bachelors", "Somecollege", "11th", "HS-grad",
+                         "Profschool", "Assoc-acdm", "Assoc-voc",
+                         "9th", "7th-8th", "12th", "Masters","1st-4th",
+                         "10th", "Doctorate", "5th-6th", "Preschool"],
+                         )
 
     st.markdown("---")
 
